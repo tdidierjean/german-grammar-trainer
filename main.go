@@ -7,15 +7,21 @@ import (
 )
 
 func main() {
-	exercise := getExercise()
-	fmt.Printf("%s (%s)", exercise.sentence, exercise.hint)
-	fmt.Println()
-	response := readInput()
+	for {
+		exercise := getExercise()
+		fmt.Printf("%s (%s)", exercise.sentence, exercise.hint)
+		fmt.Println()
+		response := readInput()
 
-	if response == exercise.answer {
-		fmt.Println("Richtig!")
-	} else {
-		fmt.Printf("Falsch! (%s)\n", exercise.answer)
+		switch response {
+		case "":
+			return
+		case exercise.answer:
+			fmt.Println("Richtig!")
+			break
+		default:
+			fmt.Printf("Falsch! (%s)\n", exercise.answer)
+		}
 	}
 }
 
