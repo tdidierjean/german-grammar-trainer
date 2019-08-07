@@ -15,9 +15,9 @@ type Exercise struct {
 }
 
 type ExerciseTemplate struct {
-	sentence     string
-	nouns        []Noun
-	grammar_case string
+	sentence    string
+	nouns       []Noun
+	grammarCase string
 }
 
 var nouns = []Noun{
@@ -47,7 +47,7 @@ func GetExercise() *Exercise {
 	noun := exerciseTemplate.nouns[rand.Intn(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
-	switch exerciseTemplate.grammar_case {
+	switch exerciseTemplate.grammarCase {
 	case Accusative:
 		exercise.Answer = articles.accusative[noun.gender]
 		break
@@ -64,7 +64,7 @@ func GetPrepositionExercise() *Exercise {
 	preposition := prepostitions[getRandIndex(len(prepostitions))]
 
 	var prepositionTemplates = []ExerciseTemplate{
-		{"Ich habe %s ... gefahren", nouns[7:9], preposition.grammar_case},
+		{"Ich habe %s ... gefahren", nouns[7:9], preposition.grammarCase},
 	}
 
 	exercise := new(Exercise)
@@ -76,7 +76,7 @@ func GetPrepositionExercise() *Exercise {
 	noun := exerciseTemplate.nouns[rand.Intn(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
-	switch exerciseTemplate.grammar_case {
+	switch exerciseTemplate.grammarCase {
 	case Accusative:
 		exercise.Answer = articles.accusative[noun.gender]
 		break

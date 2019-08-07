@@ -29,8 +29,8 @@ type Case struct {
 }
 
 type Preposition struct {
-	preposition  string
-	grammar_case string
+	preposition string
+	grammarCase string
 }
 
 var DefiniteArticlesCases = Cases{
