@@ -1,14 +1,17 @@
-package main
+package german_grammar_cli
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
 
+type randomPickable interface{}
+
 type Exercise struct {
-	sentence string
-	hint     string
-	answer   string
+	Sentence string
+	Hint     string
+	Answer   string
 }
 
 type ExerciseTemplate struct {
@@ -24,6 +27,9 @@ var nouns = []Noun{
 	{"Mann", Masculine},
 	{"Mädchen", Neuter},
 	{"Frau", Feminine},
+	{"Park", Masculine},
+	{"Gebaüde", Neuter},
+	{"See", Feminine},
 }
 
 var exerciseTemplates = []ExerciseTemplate{
@@ -31,25 +37,59 @@ var exerciseTemplates = []ExerciseTemplate{
 	{"Ich gebe ... ein Buch", nouns[3:6], Dative},
 }
 
-func getExercise() *Exercise {
+func GetExercise() *Exercise {
 	exercise := new(Exercise)
 
-	rand.Seed(time.Now().Unix())
-	exerciseTemplate := exerciseTemplates[rand.Intn(len(exerciseTemplates))]
-	exercise.sentence = exerciseTemplate.sentence
+	exerciseTemplate := exerciseTemplates[getRandIndex(len(exerciseTemplates))]
+	exercise.Sentence = exerciseTemplate.sentence
 
 	articles := articles[rand.Intn(len(articles))]
 	noun := exerciseTemplate.nouns[rand.Intn(len(exerciseTemplate.nouns))]
 
-	exercise.hint = articles.nominative[noun.gender] + " " + noun.word
+	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
 	switch exerciseTemplate.grammar_case {
 	case Accusative:
-		exercise.answer = articles.accusative[noun.gender]
+		exercise.Answer = articles.accusative[noun.gender]
 		break
 	case Dative:
-		exercise.answer = articles.dative[noun.gender]
+		exercise.Answer = articles.dative[noun.gender]
 		break
 	}
 
 	return exercise
+}
+
+func GetPrepositionExercise() *Exercise {
+
+	preposition := prepostitions[getRandIndex(len(prepostitions))]
+
+	var prepositionTemplates = []ExerciseTemplate{
+		{"Ich habe %s ... gefahren", nouns[7:9], preposition.grammar_case},
+	}
+
+	exercise := new(Exercise)
+
+	exerciseTemplate := prepositionTemplates[getRandIndex(len(prepositionTemplates))]
+	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, preposition.preposition)
+
+	articles := articles[rand.Intn(len(articles))]
+	noun := exerciseTemplate.nouns[rand.Intn(len(exerciseTemplate.nouns))]
+
+	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
+	switch exerciseTemplate.grammar_case {
+	case Accusative:
+		exercise.Answer = articles.accusative[noun.gender]
+		break
+	case Dative:
+		exercise.Answer = articles.dative[noun.gender]
+		break
+	}
+
+	return exercise
+}
+
+// Get a random number between 0 and length-1
+func getRandIndex(length int) int {
+	rand.Seed(time.Now().Unix())
+	return rand.Intn(length)
 }

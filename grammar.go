@@ -1,4 +1,4 @@
-package main
+package german_grammar_cli
 
 const Masculine = 0
 const Neuter = 1
@@ -26,6 +26,11 @@ type Case struct {
 	neutral   string
 	feminine  string
 	plural    string
+}
+
+type Preposition struct {
+	preposition  string
+	grammar_case string
 }
 
 var DefiniteArticlesCases = Cases{
@@ -61,4 +66,24 @@ var IndefiniteArticlesCases = Cases{
 var articles = []Cases{
 	DefiniteArticlesCases,
 	IndefiniteArticlesCases,
+}
+
+var prepostitions = []Preposition{
+	{"durch", Accusative},
+	{"bis", Accusative},
+	{"für", Accusative},
+	{"ohne", Accusative},
+	{"entlang", Accusative}, //along
+	{"gegen", Accusative},
+	{"um", Accusative}, //around
+	{"mit", Dative},
+	{"seit", Dative},
+	{"zu", Dative},        //to
+	{"aus", Dative},       //out
+	{"außer", Dative},     //besides
+	{"bei", Dative},       //next to
+	{"nach", Dative},      //after
+	{"seit", Dative},      //since
+	{"von", Dative},       //from
+	{"gegenüber", Dative}, //from
 }
