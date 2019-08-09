@@ -14,6 +14,10 @@ type Noun struct {
 	gender int8
 }
 
+type Adjective struct {
+	word string
+}
+
 type Cases struct {
 	nominative []string
 	accusative []string
@@ -86,4 +90,34 @@ var prepostitions = []Preposition{
 	{"seit", Dative},      //since
 	{"von", Dative},       //from
 	{"gegenüber", Dative}, //from
+}
+
+var DefiniteArticlesAdjectiveCaseEndings = Cases{
+	[]string{
+		"e", "e", "e", "en",
+	},
+	[]string{
+		"en", "e", "e", "en",
+	},
+	[]string{
+		"en", "en", "en", "en",
+	},
+	[]string{
+		"en", "en", "en", "en",
+	},
+}
+
+var IndefiniteArticlesAdjectiveCaseEndings = Cases{
+	[]string{
+		"er", "es", "e", "e",
+	},
+	[]string{
+		"en", "es", "e", "e",
+	},
+	[]string{
+		"en", "en", "en", "en",
+	},
+	[]string{
+		"en", "en", "en", "er",
+	},
 }

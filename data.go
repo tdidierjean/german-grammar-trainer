@@ -9,6 +9,7 @@ import (
 
 const exerciseTypeObject = "object"
 const exerciseTypePreposition = "preposition"
+const exerciseTypeAdjective = "adjective"
 
 type randomPickable interface{}
 
@@ -36,6 +37,13 @@ var nouns = []Noun{
 	{"See", Feminine},
 }
 
+var adjectives = []Adjective{
+	{"klein"},
+	{"groß"},
+	{"blau"},
+	{"neu"},
+}
+
 var exerciseTemplates = []ExerciseTemplate{
 	{"Ich habe ... gegessen", nouns[0:2], Accusative},
 	{"Ich gebe ... ein Buch", nouns[3:6], Dative},
@@ -55,6 +63,9 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*
 			break
 		case exerciseTypePreposition:
 			exercises = append(exercises, e.GetPrepositionExercise())
+			break
+		case exerciseTypeAdjective:
+			exercises = append(exercises, e.GetAdjectiveExercise())
 			break
 		default:
 			return nil, errors.New("Invalid exercise type requested")
@@ -111,6 +122,33 @@ func (e *ExerciseGenerator) GetPrepositionExercise() *Exercise {
 		break
 	case Dative:
 		exercise.Answer = articles.dative[noun.gender]
+		break
+	}
+
+	return exercise
+}
+
+// GetPrepositionExercise Get a single exercise of type "Adjective"
+func (e *ExerciseGenerator) GetAdjectiveExercise() *Exercise {
+
+	adjective := adjectives[e.Randomizer.getRandIndex(len(adjectives))]
+
+	var adjectiveTemplates = []ExerciseTemplate{
+		{"Mein ... %s heißt Tobias", nouns[3:4], Nominative},
+	}
+
+	exercise := new(Exercise)
+
+	exerciseTemplate := adjectiveTemplates[e.Randomizer.getRandIndex(len(adjectiveTemplates))]
+	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
+	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, noun.word)
+
+	// articles := articles[e.Randomizer.getRandIndex(len(articles))]
+
+	exercise.Hint = adjective.word
+	switch exerciseTemplate.grammarCase {
+	case Nominative:
+		exercise.Answer = adjective.word + IndefiniteArticlesAdjectiveCaseEndings.nominative[0]
 		break
 	}
 

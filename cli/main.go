@@ -12,6 +12,7 @@ import (
 
 const exerciseTypeObjectsParam = 1
 const exerciseTypePrepositionsParam = 2
+const exerciseTypeAdjectivesParam = 3
 
 var exerciseGenerator german_grammar_cli.ExerciseGenerator
 
@@ -22,6 +23,7 @@ func main() {
 	fmt.Println("Choose an exercise type:")
 	fmt.Println("1. Cases for direct or indirect objects")
 	fmt.Println("2. Cases following prepositions")
+	fmt.Println("3. Cases for adjectives")
 	choice, err := strconv.Atoi(strings.TrimSpace(readInput()))
 	if err != nil {
 		fmt.Println("Invalid input")
@@ -36,6 +38,9 @@ func main() {
 			break
 		case exerciseTypePrepositionsParam:
 			exercise = exerciseGenerator.GetPrepositionExercise()
+			break
+		case exerciseTypeAdjectivesParam:
+			exercise = exerciseGenerator.GetAdjectiveExercise()
 			break
 		default:
 			fmt.Println("Invalid choice")
