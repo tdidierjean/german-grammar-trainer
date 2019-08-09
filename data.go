@@ -134,21 +134,32 @@ func (e *ExerciseGenerator) GetAdjectiveExercise() *Exercise {
 	adjective := adjectives[e.Randomizer.getRandIndex(len(adjectives))]
 
 	var adjectiveTemplates = []ExerciseTemplate{
-		{"Mein ... %s heißt Tobias", nouns[3:4], Nominative},
+		{"%s ... %s heißt Tobias", nouns[3:4], Nominative},
+	}
+
+	var articles Cases
+	var adjectiveEndings Cases
+	switch e.Randomizer.getRandIndex(2) {
+	case 0:
+		articles = DefiniteArticlesCases
+		adjectiveEndings = DefiniteArticlesAdjectiveCaseEndings
+		break
+	case 1:
+		articles = IndefiniteArticlesCases
+		adjectiveEndings = IndefiniteArticlesAdjectiveCaseEndings
+		break
 	}
 
 	exercise := new(Exercise)
 
 	exerciseTemplate := adjectiveTemplates[e.Randomizer.getRandIndex(len(adjectiveTemplates))]
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
-	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, noun.word)
-
-	// articles := articles[e.Randomizer.getRandIndex(len(articles))]
+	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, articles.nominative[0], noun.word)
 
 	exercise.Hint = adjective.word
 	switch exerciseTemplate.grammarCase {
 	case Nominative:
-		exercise.Answer = adjective.word + IndefiniteArticlesAdjectiveCaseEndings.nominative[0]
+		exercise.Answer = adjective.word + adjectiveEndings.nominative[0]
 		break
 	}
 
