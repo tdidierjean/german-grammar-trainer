@@ -1,0 +1,13 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Exercise {
+  question: String!
+  hint: String!
+  answer: String!
+}
+
+type Query {
+  exercises(count: Int = 10): [Exercise!]!
+}
