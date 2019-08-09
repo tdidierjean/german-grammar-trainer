@@ -10,8 +10,8 @@ import (
 	"github.com/tdidierjean/german_grammar/german_grammar_cli"
 )
 
-const exerciseTypeObjects = 1
-const exerciseTypePrepositions = 2
+const exerciseTypeObjectsParam = 1
+const exerciseTypePrepositionsParam = 2
 
 var exerciseGenerator german_grammar_cli.ExerciseGenerator
 
@@ -31,10 +31,10 @@ func main() {
 	for {
 		var exercise *german_grammar_cli.Exercise
 		switch choice {
-		case exerciseTypeObjects:
-			exercise = exerciseGenerator.GetExercise()
+		case exerciseTypeObjectsParam:
+			exercise = exerciseGenerator.GetObjectExercise()
 			break
-		case exerciseTypePrepositions:
+		case exerciseTypePrepositionsParam:
 			exercise = exerciseGenerator.GetPrepositionExercise()
 			break
 		default:

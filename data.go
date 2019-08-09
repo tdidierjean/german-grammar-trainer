@@ -1,10 +1,14 @@
 package german_grammar_cli
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
 )
+
+const exerciseTypeObject = "object"
+const exerciseTypePreposition = "preposition"
 
 type randomPickable interface{}
 
@@ -41,7 +45,27 @@ type ExerciseGenerator struct {
 	Randomizer *Randomizer
 }
 
-func (e *ExerciseGenerator) GetExercise() *Exercise {
+// GetExercises Get a list of generated exercises according to the types and size requested
+func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*Exercise, error) {
+	var exercises []*Exercise
+	for i := 0; i < count; i++ {
+		switch exerciseTypes[e.Randomizer.getRandIndex(len(exerciseTypes))] {
+		case exerciseTypeObject:
+			exercises = append(exercises, e.GetObjectExercise())
+			break
+		case exerciseTypePreposition:
+			exercises = append(exercises, e.GetPrepositionExercise())
+			break
+		default:
+			return nil, errors.New("Invalid exercise type requested")
+		}
+	}
+
+	return exercises, nil
+}
+
+// GetObjectExercise Get a single exercise of type "object"
+func (e *ExerciseGenerator) GetObjectExercise() *Exercise {
 	exercise := new(Exercise)
 
 	exerciseTemplate := exerciseTemplates[e.Randomizer.getRandIndex(len(exerciseTemplates))]
@@ -63,6 +87,7 @@ func (e *ExerciseGenerator) GetExercise() *Exercise {
 	return exercise
 }
 
+// GetPrepositionExercise Get a single exercise of type "Preposition"
 func (e *ExerciseGenerator) GetPrepositionExercise() *Exercise {
 
 	preposition := prepostitions[e.Randomizer.getRandIndex(len(prepostitions))]

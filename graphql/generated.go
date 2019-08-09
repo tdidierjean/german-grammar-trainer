@@ -48,12 +48,12 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Exercises func(childComplexity int, count *int) int
+		Exercises func(childComplexity int, count *int, exerciseType *string) int
 	}
 }
 
 type QueryResolver interface {
-	Exercises(ctx context.Context, count *int) ([]*Exercise, error)
+	Exercises(ctx context.Context, count *int, exerciseType *string) ([]*Exercise, error)
 }
 
 type executableSchema struct {
@@ -102,7 +102,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Exercises(childComplexity, args["count"].(*int)), true
+		return e.complexity.Query.Exercises(childComplexity, args["count"].(*int), args["exerciseType"].(*string)), true
 
 	}
 	return 0, false
@@ -164,7 +164,7 @@ type Exercise {
 }
 
 type Query {
-  exercises(count: Int = 10): [Exercise!]!
+  exercises(count: Int = 10, exerciseType: String): [Exercise!]!
 }`},
 )
 
@@ -197,6 +197,14 @@ func (ec *executionContext) field_Query_exercises_args(ctx context.Context, rawA
 		}
 	}
 	args["count"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["exerciseType"]; ok {
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["exerciseType"] = arg1
 	return args, nil
 }
 
@@ -373,7 +381,7 @@ func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Exercises(rctx, args["count"].(*int))
+		return ec.resolvers.Query().Exercises(rctx, args["count"].(*int), args["exerciseType"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
