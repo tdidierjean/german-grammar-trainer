@@ -13,7 +13,12 @@ import (
 const exerciseTypeObjects = 1
 const exerciseTypePrepositions = 2
 
+var exerciseGenerator german_grammar_cli.ExerciseGenerator
+
 func main() {
+	var randomizer = new(german_grammar_cli.Randomizer)
+	exerciseGenerator := german_grammar_cli.ExerciseGenerator{Randomizer: randomizer}
+
 	fmt.Println("Choose an exercise type:")
 	fmt.Println("1. Cases for direct or indirect objects")
 	fmt.Println("2. Cases following prepositions")
@@ -27,10 +32,10 @@ func main() {
 		var exercise *german_grammar_cli.Exercise
 		switch choice {
 		case exerciseTypeObjects:
-			exercise = german_grammar_cli.GetExercise()
+			exercise = exerciseGenerator.GetExercise()
 			break
 		case exerciseTypePrepositions:
-			exercise = german_grammar_cli.GetPrepositionExercise()
+			exercise = exerciseGenerator.GetPrepositionExercise()
 			break
 		default:
 			fmt.Println("Invalid choice")

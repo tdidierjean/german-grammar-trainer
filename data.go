@@ -37,14 +37,18 @@ var exerciseTemplates = []ExerciseTemplate{
 	{"Ich gebe ... ein Buch", nouns[3:6], Dative},
 }
 
-func GetExercise() *Exercise {
+type ExerciseGenerator struct {
+	Randomizer *Randomizer
+}
+
+func (e *ExerciseGenerator) GetExercise() *Exercise {
 	exercise := new(Exercise)
 
-	exerciseTemplate := exerciseTemplates[getRandIndex(len(exerciseTemplates))]
+	exerciseTemplate := exerciseTemplates[e.Randomizer.getRandIndex(len(exerciseTemplates))]
 	exercise.Sentence = exerciseTemplate.sentence
 
-	articles := articles[rand.Intn(len(articles))]
-	noun := exerciseTemplate.nouns[rand.Intn(len(exerciseTemplate.nouns))]
+	articles := articles[e.Randomizer.getRandIndex(len(articles))]
+	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
 	switch exerciseTemplate.grammarCase {
@@ -59,21 +63,21 @@ func GetExercise() *Exercise {
 	return exercise
 }
 
-func GetPrepositionExercise() *Exercise {
+func (e *ExerciseGenerator) GetPrepositionExercise() *Exercise {
 
-	preposition := prepostitions[getRandIndex(len(prepostitions))]
+	preposition := prepostitions[e.Randomizer.getRandIndex(len(prepostitions))]
 
 	var prepositionTemplates = []ExerciseTemplate{
-		{"Ich habe %s ... gefahren", nouns[7:9], preposition.grammarCase},
+		{"Ich bin %s ... gefahren", nouns[7:9], preposition.grammarCase},
 	}
 
 	exercise := new(Exercise)
 
-	exerciseTemplate := prepositionTemplates[getRandIndex(len(prepositionTemplates))]
+	exerciseTemplate := prepositionTemplates[e.Randomizer.getRandIndex(len(prepositionTemplates))]
 	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, preposition.preposition)
 
-	articles := articles[rand.Intn(len(articles))]
-	noun := exerciseTemplate.nouns[rand.Intn(len(exerciseTemplate.nouns))]
+	articles := articles[e.Randomizer.getRandIndex(len(articles))]
+	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
 	switch exerciseTemplate.grammarCase {
@@ -86,10 +90,19 @@ func GetPrepositionExercise() *Exercise {
 	}
 
 	return exercise
+}
+
+type Randomizer struct {
+	initialized bool
 }
 
 // Get a random number between 0 and length-1
-func getRandIndex(length int) int {
-	rand.Seed(time.Now().Unix())
+func (r *Randomizer) getRandIndex(length int) int {
+	// Set the seed once and only once
+	if r.initialized != true {
+		rand.Seed(time.Now().Unix())
+		r.initialized = true
+	}
+
 	return rand.Intn(length)
 }
