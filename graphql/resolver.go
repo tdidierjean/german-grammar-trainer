@@ -40,6 +40,10 @@ func (r *queryResolver) Exercises(ctx context.Context, count *int, exerciseType 
 	return exercises, nil
 }
 
+func (r *queryResolver) ExerciseTypes(ctx context.Context) ([]string, error) {
+	return german_grammar_cli.ExerciseTypes, nil
+}
+
 func (r *Resolver) transformExeciseToGraphQL(exercise *german_grammar_cli.Exercise) *Exercise {
 	return &Exercise{
 		Question: exercise.Sentence,

@@ -10,4 +10,5 @@ type Exercise {
 
 type Query {
   exercises(count: Int = 10, exerciseType: String): [Exercise!]!
+  exerciseTypes: [String!]!
 }

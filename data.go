@@ -11,6 +11,12 @@ const exerciseTypeObject = "object"
 const exerciseTypePreposition = "preposition"
 const exerciseTypeAdjective = "adjective"
 
+var ExerciseTypes = []string{
+	exerciseTypeObject,
+	exerciseTypePreposition,
+	exerciseTypeAdjective,
+}
+
 type randomPickable interface{}
 
 type Exercise struct {
