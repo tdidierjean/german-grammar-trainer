@@ -7,17 +7,17 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tdidierjean/german_grammar/german_grammar_server/exercise"
+	"github.com/tdidierjean/german_grammar/german_grammar_server/grammarexercise"
 )
 
 const exerciseTypeObjectsParam = 1
 const exerciseTypePrepositionsParam = 2
 const exerciseTypeAdjectivesParam = 3
 
-var exerciseGenerator exercise.ExerciseGenerator
+var exerciseGenerator grammarexercise.ExerciseGenerator
 
 func main() {
-	exerciseGenerator := exercise.CreateExerciseGenerator()
+	exerciseGenerator := grammarexercise.CreateExerciseGenerator()
 
 	fmt.Println("Choose an exercise type:")
 	fmt.Println("1. Cases for direct or indirect objects")
@@ -30,16 +30,16 @@ func main() {
 	}
 
 	for {
-		var exercise *exercise.Exercise
+		var exercise *grammarexercise.Exercise
 		switch choice {
 		case exerciseTypeObjectsParam:
-			exercise = exerciseGenerator.GetObjectExercise()
+			exercise = exerciseGenerator.GetObjectExercise(grammarexercise.ObjectExerciseTemplates)
 			break
 		case exerciseTypePrepositionsParam:
-			exercise = exerciseGenerator.GetPrepositionExercise()
+			exercise = exerciseGenerator.GetPrepositionExercise(grammarexercise.PrepositionTemplates)
 			break
 		case exerciseTypeAdjectivesParam:
-			exercise = exerciseGenerator.GetAdjectiveExercise()
+			exercise = exerciseGenerator.GetAdjectiveExercise(grammarexercise.AdjectiveTemplates)
 			break
 		default:
 			fmt.Println("Invalid choice")

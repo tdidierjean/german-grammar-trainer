@@ -1,4 +1,4 @@
-package exercise
+package grammarexercise
 
 import (
 	"errors"
@@ -50,9 +50,17 @@ var adjectives = []Adjective{
 	{"neu"},
 }
 
-var exerciseTemplates = []ExerciseTemplate{
+var ObjectExerciseTemplates = []ExerciseTemplate{
 	{"Ich habe ... gegessen", nouns[0:2], Accusative},
 	{"Ich gebe ... ein Buch", nouns[3:6], Dative},
+}
+
+var PrepositionTemplates = []ExerciseTemplate{
+	{"Ich bin %s ... gefahren", nouns[7:9], ""},
+}
+
+var AdjectiveTemplates = []ExerciseTemplate{
+	{"%s ... %s heißt Tobias", nouns[3:4], Nominative},
 }
 
 type ExerciseGenerator struct {
@@ -65,13 +73,13 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*
 	for i := 0; i < count; i++ {
 		switch exerciseTypes[e.Randomizer.getRandIndex(len(exerciseTypes))] {
 		case exerciseTypeObject:
-			exercises = append(exercises, e.GetObjectExercise())
+			exercises = append(exercises, e.GetObjectExercise(ObjectExerciseTemplates))
 			break
 		case exerciseTypePreposition:
-			exercises = append(exercises, e.GetPrepositionExercise())
+			exercises = append(exercises, e.GetPrepositionExercise(PrepositionTemplates))
 			break
 		case exerciseTypeAdjective:
-			exercises = append(exercises, e.GetAdjectiveExercise())
+			exercises = append(exercises, e.GetAdjectiveExercise(AdjectiveTemplates))
 			break
 		default:
 			return nil, errors.New("Invalid exercise type requested")
@@ -82,10 +90,10 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*
 }
 
 // GetObjectExercise Get a single exercise of type "object"
-func (e *ExerciseGenerator) GetObjectExercise() *Exercise {
+func (e *ExerciseGenerator) GetObjectExercise(templates []ExerciseTemplate) *Exercise {
 	exercise := new(Exercise)
 
-	exerciseTemplate := exerciseTemplates[e.Randomizer.getRandIndex(len(exerciseTemplates))]
+	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
 	exercise.Sentence = exerciseTemplate.sentence
 
 	articles := articles[e.Randomizer.getRandIndex(len(articles))]
@@ -105,24 +113,18 @@ func (e *ExerciseGenerator) GetObjectExercise() *Exercise {
 }
 
 // GetPrepositionExercise Get a single exercise of type "Preposition"
-func (e *ExerciseGenerator) GetPrepositionExercise() *Exercise {
-
+func (e *ExerciseGenerator) GetPrepositionExercise(templates []ExerciseTemplate) *Exercise {
+	exercise := new(Exercise)
 	preposition := prepostitions[e.Randomizer.getRandIndex(len(prepostitions))]
 
-	var prepositionTemplates = []ExerciseTemplate{
-		{"Ich bin %s ... gefahren", nouns[7:9], preposition.grammarCase},
-	}
-
-	exercise := new(Exercise)
-
-	exerciseTemplate := prepositionTemplates[e.Randomizer.getRandIndex(len(prepositionTemplates))]
+	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
 	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, preposition.preposition)
 
 	articles := articles[e.Randomizer.getRandIndex(len(articles))]
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
-	switch exerciseTemplate.grammarCase {
+	switch preposition.grammarCase {
 	case Accusative:
 		exercise.Answer = articles.accusative[noun.gender]
 		break
@@ -134,14 +136,9 @@ func (e *ExerciseGenerator) GetPrepositionExercise() *Exercise {
 	return exercise
 }
 
-// GetPrepositionExercise Get a single exercise of type "Adjective"
-func (e *ExerciseGenerator) GetAdjectiveExercise() *Exercise {
-
+// GetAdjectiveExercise Get a single exercise of type "Adjective"
+func (e *ExerciseGenerator) GetAdjectiveExercise(templates []ExerciseTemplate) *Exercise {
 	adjective := adjectives[e.Randomizer.getRandIndex(len(adjectives))]
-
-	var adjectiveTemplates = []ExerciseTemplate{
-		{"%s ... %s heißt Tobias", nouns[3:4], Nominative},
-	}
 
 	var articles Cases
 	var adjectiveEndings Cases
@@ -158,7 +155,7 @@ func (e *ExerciseGenerator) GetAdjectiveExercise() *Exercise {
 
 	exercise := new(Exercise)
 
-	exerciseTemplate := adjectiveTemplates[e.Randomizer.getRandIndex(len(adjectiveTemplates))]
+	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, articles.nominative[0], noun.word)
 

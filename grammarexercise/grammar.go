@@ -1,4 +1,4 @@
-package exercise
+package grammarexercise
 
 const Masculine = 0
 const Neuter = 1

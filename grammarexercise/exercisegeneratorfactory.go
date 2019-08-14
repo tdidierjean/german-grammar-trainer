@@ -1,4 +1,4 @@
-package exercise
+package grammarexercise
 
 // CreateExerciseGenerator factory method to get an exercise generator
 func CreateExerciseGenerator() *ExerciseGenerator {
