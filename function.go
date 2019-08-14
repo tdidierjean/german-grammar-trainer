@@ -1,9 +1,9 @@
-package german_grammar_cli
+package german_grammar_server
 
 import (
 	"net/http"
 
-	"github.com/tdidierjean/german_grammar/german_grammar_cli/graphql"
+	"github.com/tdidierjean/german_grammar/german_grammar_server/graphql"
 )
 
 // GraphQLServer Entry point for Google Cloud functions

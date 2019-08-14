@@ -406,7 +406,7 @@ func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.
 	res := resTmp.([]*Exercise)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_cliᚋgraphqlᚐExercise(ctx, field.Selections, res)
+	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_exerciseTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2034,11 +2034,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNExercise2githubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_cliᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2githubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v Exercise) graphql.Marshaler {
 	return ec._Exercise(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_cliᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v []*Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v []*Exercise) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2062,7 +2062,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_cliᚋgraphqlᚐExercise(ctx, sel, v[i])
+			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2075,7 +2075,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_cliᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v *Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v *Exercise) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

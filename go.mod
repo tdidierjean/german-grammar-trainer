@@ -1,4 +1,4 @@
-module github.com/tdidierjean/german_grammar/german_grammar_cli
+module github.com/tdidierjean/german_grammar/german_grammar_server
 
 go 1.12
 
