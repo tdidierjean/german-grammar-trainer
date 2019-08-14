@@ -1,4 +1,4 @@
-package main
+package graphql
 
 import (
 	"log"
@@ -7,12 +7,11 @@ import (
 
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gorilla/handlers"
-	"github.com/tdidierjean/german_grammar/german_grammar_cli/graphql"
 )
 
 const defaultPort = "8080"
 
-func main() {
+func Server() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
@@ -20,12 +19,16 @@ func main() {
 
 	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
 
-	http.Handle("/query", handlers.CORS(
-		handlers.AllowedHeaders([]string{"content-type"}),
-		handlers.AllowedOrigins([]string{"*"}),
-		handlers.AllowCredentials(),
-	)(handlers.LoggingHandler(os.Stdout, handler.GraphQL(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}})))))
+	http.Handle("/query", GetHandler())
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func GetHandler() http.Handler {
+	return handlers.CORS(
+		handlers.AllowedHeaders([]string{"content-type"}),
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowCredentials(),
+	)(handlers.LoggingHandler(os.Stdout, handler.GraphQL(NewExecutableSchema(Config{Resolvers: &Resolver{}}))))
 }

@@ -1,4 +1,4 @@
-package german_grammar_cli
+package exercises
 
 import (
 	"errors"
