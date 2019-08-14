@@ -1,4 +1,4 @@
-package exercises
+package exercise
 
 const Masculine = 0
 const Neuter = 1

@@ -7,18 +7,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tdidierjean/german_grammar/exercises"
+	"github.com/tdidierjean/german_grammar/exercise"
 )
 
 const exerciseTypeObjectsParam = 1
 const exerciseTypePrepositionsParam = 2
 const exerciseTypeAdjectivesParam = 3
 
-var exerciseGenerator exercises.ExerciseGenerator
+var exerciseGenerator exercise.ExerciseGenerator
 
 func main() {
-	var randomizer = new(exercises.Randomizer)
-	exerciseGenerator := exercises.ExerciseGenerator{Randomizer: randomizer}
+	var randomizer = new(exercise.Randomizer)
+	exerciseGenerator := exercise.ExerciseGenerator{Randomizer: randomizer}
 
 	fmt.Println("Choose an exercise type:")
 	fmt.Println("1. Cases for direct or indirect objects")
@@ -31,7 +31,7 @@ func main() {
 	}
 
 	for {
-		var exercise *exercises.Exercise
+		var exercise *exercise.Exercise
 		switch choice {
 		case exerciseTypeObjectsParam:
 			exercise = exerciseGenerator.GetObjectExercise()

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/tdidierjean/german_grammar/german_grammar_cli/exercises"
+	"github.com/tdidierjean/german_grammar/german_grammar_cli/exercise"
 ) // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
 type Resolver struct {
@@ -19,8 +19,8 @@ type queryResolver struct{ *Resolver }
 
 // Query parameters are always passed as pointers by gqlgen
 func (r *queryResolver) Exercises(ctx context.Context, count *int, exerciseType *string) ([]*Exercise, error) {
-	var randomizer = new(exercises.Randomizer)
-	exerciseGenerator := exercises.ExerciseGenerator{Randomizer: randomizer}
+	var randomizer = new(exercise.Randomizer)
+	exerciseGenerator := exercise.ExerciseGenerator{Randomizer: randomizer}
 
 	if exerciseType == nil {
 		return nil, errors.New("No exercise type specified")
@@ -41,10 +41,10 @@ func (r *queryResolver) Exercises(ctx context.Context, count *int, exerciseType 
 }
 
 func (r *queryResolver) ExerciseTypes(ctx context.Context) ([]string, error) {
-	return exercises.ExerciseTypes, nil
+	return exercise.ExerciseTypes, nil
 }
 
-func (r *Resolver) transformExeciseToGraphQL(exercise *exercises.Exercise) *Exercise {
+func (r *Resolver) transformExeciseToGraphQL(exercise *exercise.Exercise) *Exercise {
 	return &Exercise{
 		Question: exercise.Sentence,
 		Hint:     exercise.Hint,
