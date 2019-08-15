@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"reflect"
 	"time"
 )
 
@@ -45,7 +46,7 @@ var nouns = []Noun{
 
 var adjectives = []Adjective{
 	{"klein"},
-	{"groß"},
+	{"jung"},
 	{"blau"},
 	{"neu"},
 }
@@ -60,7 +61,8 @@ var PrepositionTemplates = []ExerciseTemplate{
 }
 
 var AdjectiveTemplates = []ExerciseTemplate{
-	{"%s ... %s heißt Tobias", nouns[3:4], Nominative},
+	{"%s ... %s ist hier", nouns[3:6], Nominative},
+	{"Ich esse %s ... %s.", nouns[0:3], Accusative},
 }
 
 type ExerciseGenerator struct {
@@ -100,14 +102,8 @@ func (e *ExerciseGenerator) GetObjectExercise(templates []ExerciseTemplate) *Exe
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
-	switch exerciseTemplate.grammarCase {
-	case Accusative:
-		exercise.Answer = articles.accusative[noun.gender]
-		break
-	case Dative:
-		exercise.Answer = articles.dative[noun.gender]
-		break
-	}
+
+	exercise.Answer = reflect.ValueOf(articles).FieldByName(exerciseTemplate.grammarCase).Index(int(noun.gender)).String()
 
 	return exercise
 }
@@ -124,14 +120,8 @@ func (e *ExerciseGenerator) GetPrepositionExercise(templates []ExerciseTemplate)
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
-	switch preposition.grammarCase {
-	case Accusative:
-		exercise.Answer = articles.accusative[noun.gender]
-		break
-	case Dative:
-		exercise.Answer = articles.dative[noun.gender]
-		break
-	}
+
+	exercise.Answer = reflect.ValueOf(articles).FieldByName(preposition.grammarCase).Index(int(noun.gender)).String()
 
 	return exercise
 }
@@ -157,14 +147,12 @@ func (e *ExerciseGenerator) GetAdjectiveExercise(templates []ExerciseTemplate) *
 
 	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
-	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, articles.nominative[0], noun.word)
+	caseArticles := reflect.ValueOf(articles).FieldByName(exerciseTemplate.grammarCase)
+	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, caseArticles.Index(int(noun.gender)), noun.word)
 
 	exercise.Hint = adjective.word
-	switch exerciseTemplate.grammarCase {
-	case Nominative:
-		exercise.Answer = adjective.word + adjectiveEndings.nominative[0]
-		break
-	}
+	ending := reflect.ValueOf(adjectiveEndings).FieldByName(exerciseTemplate.grammarCase).Index(int(noun.gender))
+	exercise.Answer = adjective.word + ending.String()
 
 	return exercise
 }
