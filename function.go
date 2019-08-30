@@ -3,7 +3,7 @@ package german_grammar_server
 import (
 	"net/http"
 
-	"github.com/tdidierjean/german_grammar/german_grammar_server/graphql"
+	"github.com/tdidierjean/german_grammar/german_grammar_server/api/graphql"
 )
 
 // GraphQLServer Entry point for Google Cloud functions

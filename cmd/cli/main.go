@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tdidierjean/german_grammar/german_grammar_server/grammarexercise"
+	grammarexercise "github.com/tdidierjean/german_grammar/german_grammar_server/app"
 )
 
 const exerciseTypeObjectsParam = 1

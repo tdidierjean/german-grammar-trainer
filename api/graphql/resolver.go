@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/tdidierjean/german_grammar/german_grammar_server/grammarexercise"
+	grammarexercise "github.com/tdidierjean/german_grammar/german_grammar_server/app"
 ) // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
 type Resolver struct {
