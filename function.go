@@ -9,6 +9,5 @@ import (
 // GraphQLServer Entry point for Google Cloud functions
 // Deploy with: `gcloud functions deploy GraphQLServer --runtime go111 --trigger-http`
 func GraphQLServer(w http.ResponseWriter, r *http.Request) {
-	// graphql.Server()
 	graphql.GetHandler().ServeHTTP(w, r)
 }
