@@ -67,12 +67,12 @@ var IndefiniteArticlesCases = Cases{
 	},
 }
 
-var articles = []Cases{
+var AllArticles = []Cases{
 	DefiniteArticlesCases,
 	IndefiniteArticlesCases,
 }
 
-var prepostitions = []Preposition{
+var Prepositions = []Preposition{
 	{"durch", Accusative},
 	{"bis", Accusative},
 	{"für", Accusative},

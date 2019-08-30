@@ -8,14 +8,14 @@ import (
 	"time"
 )
 
-const exerciseTypeObject = "object"
-const exerciseTypePreposition = "preposition"
-const exerciseTypeAdjective = "adjective"
+const ExerciseTypeObject = "object"
+const ExerciseTypePreposition = "preposition"
+const ExerciseTypeAdjective = "adjective"
 
 var ExerciseTypes = []string{
-	exerciseTypeObject,
-	exerciseTypePreposition,
-	exerciseTypeAdjective,
+	ExerciseTypeObject,
+	ExerciseTypePreposition,
+	ExerciseTypeAdjective,
 }
 
 type randomPickable interface{}
@@ -44,7 +44,7 @@ var nouns = []Noun{
 	{"See", Feminine},
 }
 
-var adjectives = []Adjective{
+var defaultAdjectives = []Adjective{
 	{"klein"},
 	{"jung"},
 	{"blau"},
@@ -69,6 +69,12 @@ type ExerciseGenerator struct {
 	Randomizer *Randomizer
 }
 
+// CreateExerciseGenerator factory method to get an exercise generator
+func CreateExerciseGenerator() *ExerciseGenerator {
+	var randomizer = new(Randomizer)
+	return &ExerciseGenerator{Randomizer: randomizer}
+}
+
 // GetExercises Get a list of generated exercises according to the types and size requested
 // possible types are object, preposition and adjective
 // if multiple types are specified, the type of each exercise is randomly picked within those types
@@ -76,14 +82,14 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*
 	var exercises []*Exercise
 	for i := 0; i < count; i++ {
 		switch exerciseTypes[e.Randomizer.getRandIndex(len(exerciseTypes))] {
-		case exerciseTypeObject:
-			exercises = append(exercises, e.GetObjectExercise(ObjectExerciseTemplates))
+		case ExerciseTypeObject:
+			exercises = append(exercises, e.GetObjectExerciseDefault(ObjectExerciseTemplates))
 			break
-		case exerciseTypePreposition:
-			exercises = append(exercises, e.GetPrepositionExercise(PrepositionTemplates))
+		case ExerciseTypePreposition:
+			exercises = append(exercises, e.GetPrepositionExerciseDefault(PrepositionTemplates))
 			break
-		case exerciseTypeAdjective:
-			exercises = append(exercises, e.GetAdjectiveExercise(AdjectiveTemplates))
+		case ExerciseTypeAdjective:
+			exercises = append(exercises, e.GetAdjectiveExerciseDefault(AdjectiveTemplates))
 			break
 		default:
 			return nil, errors.New("Invalid exercise type requested")
@@ -93,14 +99,26 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*
 	return exercises, nil
 }
 
-// GetObjectExercise Get a single exercise of type "object"
-func (e *ExerciseGenerator) GetObjectExercise(templates []ExerciseTemplate) *Exercise {
+// GetExercise Get a single generated exercise according to the types requested
+// possible types are object, preposition and adjective
+// if multiple types are specified, the type of the exercise is randomly picked within those types
+func (e *ExerciseGenerator) GetExercise(exerciseTypes []string) (*Exercise, error) {
+	exercises, err := e.GetExercises(exerciseTypes, 1)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return exercises[0], nil
+}
+
+// getObjectExercise Get a single exercise of type "object", specifying a subset of available articles
+func (e *ExerciseGenerator) getObjectExercise(templates []ExerciseTemplate, articles Cases) *Exercise {
 	exercise := new(Exercise)
 
 	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
 	exercise.Sentence = exerciseTemplate.sentence
 
-	articles := articles[e.Randomizer.getRandIndex(len(articles))]
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
@@ -110,15 +128,19 @@ func (e *ExerciseGenerator) GetObjectExercise(templates []ExerciseTemplate) *Exe
 	return exercise
 }
 
-// GetPrepositionExercise Get a single exercise of type "Preposition"
-func (e *ExerciseGenerator) GetPrepositionExercise(templates []ExerciseTemplate) *Exercise {
+// GetObjectExerciseDefault Get a single exercise of type "object" with a random class of articles
+func (e *ExerciseGenerator) GetObjectExerciseDefault(templates []ExerciseTemplate) *Exercise {
+	return e.getObjectExercise(templates, AllArticles[e.Randomizer.getRandIndex(len(AllArticles))])
+}
+
+// getPrepositionExercise Get a single exercise of type "Preposition"
+func (e *ExerciseGenerator) getPrepositionExercise(templates []ExerciseTemplate, articles Cases, prepositions []Preposition) *Exercise {
 	exercise := new(Exercise)
-	preposition := prepostitions[e.Randomizer.getRandIndex(len(prepostitions))]
+	preposition := prepositions[e.Randomizer.getRandIndex(len(prepositions))]
 
 	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
 	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, preposition.preposition)
 
-	articles := articles[e.Randomizer.getRandIndex(len(articles))]
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
@@ -128,10 +150,31 @@ func (e *ExerciseGenerator) GetPrepositionExercise(templates []ExerciseTemplate)
 	return exercise
 }
 
-// GetAdjectiveExercise Get a single exercise of type "Adjective"
-func (e *ExerciseGenerator) GetAdjectiveExercise(templates []ExerciseTemplate) *Exercise {
+// GetPrepositionExerciseDefault Get a single exercise of type "preposition" with a random class of articles
+func (e *ExerciseGenerator) GetPrepositionExerciseDefault(templates []ExerciseTemplate) *Exercise {
+	return e.getPrepositionExercise(templates, AllArticles[e.Randomizer.getRandIndex(len(AllArticles))], Prepositions)
+}
+
+// getAdjectiveExercise Get a single exercise of type "Adjective"
+func (e *ExerciseGenerator) getAdjectiveExercise(templates []ExerciseTemplate, articles Cases, adjectiveEndings Cases, adjectives []Adjective) *Exercise {
 	adjective := adjectives[e.Randomizer.getRandIndex(len(adjectives))]
 
+	exercise := new(Exercise)
+
+	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
+	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
+	caseArticles := reflect.ValueOf(articles).FieldByName(exerciseTemplate.grammarCase)
+	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, caseArticles.Index(int(noun.gender)), noun.word)
+
+	exercise.Hint = adjective.word
+	ending := reflect.ValueOf(adjectiveEndings).FieldByName(exerciseTemplate.grammarCase).Index(int(noun.gender))
+	exercise.Answer = adjective.word + ending.String()
+
+	return exercise
+}
+
+// GetAdjectiveExerciseDefault Get a single exercise of type "adjective" using default adjetives
+func (e *ExerciseGenerator) GetAdjectiveExerciseDefault(templates []ExerciseTemplate) *Exercise {
 	var articles Cases
 	var adjectiveEndings Cases
 	// randomly pick either definite articles ("der") or indefinite articles ("ein") for the exercise
@@ -146,18 +189,7 @@ func (e *ExerciseGenerator) GetAdjectiveExercise(templates []ExerciseTemplate) *
 		break
 	}
 
-	exercise := new(Exercise)
-
-	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
-	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
-	caseArticles := reflect.ValueOf(articles).FieldByName(exerciseTemplate.grammarCase)
-	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, caseArticles.Index(int(noun.gender)), noun.word)
-
-	exercise.Hint = adjective.word
-	ending := reflect.ValueOf(adjectiveEndings).FieldByName(exerciseTemplate.grammarCase).Index(int(noun.gender))
-	exercise.Answer = adjective.word + ending.String()
-
-	return exercise
+	return e.getAdjectiveExercise(templates, articles, adjectiveEndings, defaultAdjectives)
 }
 
 type Randomizer struct {

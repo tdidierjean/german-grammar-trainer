@@ -30,21 +30,29 @@ func main() {
 	}
 
 	for {
-		var exercise *grammarexercise.Exercise
+		exerciseType := ""
 		switch choice {
 		case exerciseTypeObjectsParam:
-			exercise = exerciseGenerator.GetObjectExercise(grammarexercise.ObjectExerciseTemplates)
+			exerciseType = grammarexercise.ExerciseTypeObject
 			break
 		case exerciseTypePrepositionsParam:
-			exercise = exerciseGenerator.GetPrepositionExercise(grammarexercise.PrepositionTemplates)
+			exerciseType = grammarexercise.ExerciseTypePreposition
 			break
 		case exerciseTypeAdjectivesParam:
-			exercise = exerciseGenerator.GetAdjectiveExercise(grammarexercise.AdjectiveTemplates)
+			exerciseType = grammarexercise.ExerciseTypeAdjective
 			break
 		default:
 			fmt.Println("Invalid choice")
 			return
 		}
+
+		exercise, err := exerciseGenerator.GetExercise([]string{exerciseType})
+
+		if err != nil {
+			fmt.Println("Unexpected error!")
+			return
+		}
+
 		fmt.Printf("%s (%s)", exercise.Sentence, exercise.Hint)
 		fmt.Println()
 		response := strings.TrimSpace(readInput())
