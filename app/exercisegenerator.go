@@ -70,6 +70,8 @@ type ExerciseGenerator struct {
 }
 
 // GetExercises Get a list of generated exercises according to the types and size requested
+// possible types are object, preposition and adjective
+// if multiple types are specified, the type of each exercise is randomly picked within those types
 func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*Exercise, error) {
 	var exercises []*Exercise
 	for i := 0; i < count; i++ {
@@ -132,6 +134,7 @@ func (e *ExerciseGenerator) GetAdjectiveExercise(templates []ExerciseTemplate) *
 
 	var articles Cases
 	var adjectiveEndings Cases
+	// randomly pick either definite articles ("der") or indefinite articles ("ein") for the exercise
 	switch e.Randomizer.getRandIndex(2) {
 	case 0:
 		articles = DefiniteArticlesCases
