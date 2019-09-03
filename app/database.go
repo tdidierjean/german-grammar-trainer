@@ -63,7 +63,6 @@ func (c *Connection) GetUserExerciseType(userID int) string {
 		return ""
 	}
 
-	// fmt.Printf("Found a single document: %+v\n", found)
 	return found.ExerciseType
 }
 
