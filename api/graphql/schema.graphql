@@ -12,3 +12,11 @@ type Query {
   exercises(count: Int = 10, exerciseType: String): [Exercise!]!
   exerciseTypes: [String!]!
 }
+
+input NewExerciseType {
+  exerciseType: String!
+}
+
+type Mutation {
+  updateExerciseType(input: NewExerciseType!): String
+}

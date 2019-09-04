@@ -7,3 +7,7 @@ type Exercise struct {
 	Hint     string `json:"hint"`
 	Answer   string `json:"answer"`
 }
+
+type NewExerciseType struct {
+	ExerciseType string `json:"exerciseType"`
+}

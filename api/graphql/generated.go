@@ -34,6 +34,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Mutation() MutationResolver
 	Query() QueryResolver
 }
 
@@ -47,12 +48,19 @@ type ComplexityRoot struct {
 		Question func(childComplexity int) int
 	}
 
+	Mutation struct {
+		UpdateExerciseType func(childComplexity int, input NewExerciseType) int
+	}
+
 	Query struct {
 		ExerciseTypes func(childComplexity int) int
 		Exercises     func(childComplexity int, count *int, exerciseType *string) int
 	}
 }
 
+type MutationResolver interface {
+	UpdateExerciseType(ctx context.Context, input NewExerciseType) (*string, error)
+}
 type QueryResolver interface {
 	Exercises(ctx context.Context, count *int, exerciseType *string) ([]*Exercise, error)
 	ExerciseTypes(ctx context.Context) ([]string, error)
@@ -93,6 +101,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Exercise.Question(childComplexity), true
+
+	case "Mutation.updateExerciseType":
+		if e.complexity.Mutation.UpdateExerciseType == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateExerciseType_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateExerciseType(childComplexity, args["input"].(NewExerciseType)), true
 
 	case "Query.exerciseTypes":
 		if e.complexity.Query.ExerciseTypes == nil {
@@ -135,7 +155,20 @@ func (e *executableSchema) Query(ctx context.Context, op *ast.OperationDefinitio
 }
 
 func (e *executableSchema) Mutation(ctx context.Context, op *ast.OperationDefinition) *graphql.Response {
-	return graphql.ErrorResponse(ctx, "mutations are not supported")
+	ec := executionContext{graphql.GetRequestContext(ctx), e}
+
+	buf := ec.RequestMiddleware(ctx, func(ctx context.Context) []byte {
+		data := ec._Mutation(ctx, op.SelectionSet)
+		var buf bytes.Buffer
+		data.MarshalGQL(&buf)
+		return buf.Bytes()
+	})
+
+	return &graphql.Response{
+		Data:       buf,
+		Errors:     ec.Errors,
+		Extensions: ec.Extensions,
+	}
 }
 
 func (e *executableSchema) Subscription(ctx context.Context, op *ast.OperationDefinition) func() *graphql.Response {
@@ -175,12 +208,34 @@ type Exercise {
 type Query {
   exercises(count: Int = 10, exerciseType: String): [Exercise!]!
   exerciseTypes: [String!]!
+}
+
+input NewExerciseType {
+  exerciseType: String!
+}
+
+type Mutation {
+  updateExerciseType(input: NewExerciseType!): String
 }`},
 )
 
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_updateExerciseType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 NewExerciseType
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewExerciseType2githubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋapiᚋgraphqlᚐNewExerciseType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -365,6 +420,47 @@ func (ec *executionContext) _Exercise_answer(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_updateExerciseType(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateExerciseType_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateExerciseType(rctx, args["input"].(NewExerciseType))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -406,7 +502,7 @@ func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.
 	res := resTmp.([]*Exercise)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx, field.Selections, res)
+	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋapiᚋgraphqlᚐExercise(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_exerciseTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1672,6 +1768,24 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputNewExerciseType(ctx context.Context, obj interface{}) (NewExerciseType, error) {
+	var it NewExerciseType
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "exerciseType":
+			var err error
+			it.ExerciseType, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -1706,6 +1820,34 @@ func (ec *executionContext) _Exercise(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, mutationImplementors)
+
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "updateExerciseType":
+			out.Values[i] = ec._Mutation_updateExerciseType(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2034,11 +2176,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNExercise2githubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2githubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋapiᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v Exercise) graphql.Marshaler {
 	return ec._Exercise(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v []*Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋapiᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v []*Exercise) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2062,7 +2204,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx, sel, v[i])
+			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋapiᚋgraphqlᚐExercise(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2075,7 +2217,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋtdidierjeanᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v *Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋapiᚋgraphqlᚐExercise(ctx context.Context, sel ast.SelectionSet, v *Exercise) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2083,6 +2225,10 @@ func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋtdidierjeanᚋger
 		return graphql.Null
 	}
 	return ec._Exercise(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNNewExerciseType2githubᚗcomᚋtdidierjeanᚋgerman_grammarᚋgerman_grammar_serverᚋapiᚋgraphqlᚐNewExerciseType(ctx context.Context, v interface{}) (NewExerciseType, error) {
+	return ec.unmarshalInputNewExerciseType(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

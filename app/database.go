@@ -3,7 +3,6 @@ package grammarexercise
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,6 +22,14 @@ type Connection struct {
 type UserExerciseType struct {
 	UserID       int
 	ExerciseType string
+}
+
+// NewDatabaseConnection create a new client and establish connection
+func NewDatabaseConnection() *Connection {
+	c := new(Connection)
+	c.Connect()
+
+	return c
 }
 
 // Connect attempts to connect to the MongoDB instance, returns true if successful
@@ -67,7 +74,7 @@ func (c *Connection) GetUserExerciseType(userID int) string {
 }
 
 // UpdateUserExerciseType inserts or update the stored exercise type for the user
-func (c *Connection) UpdateUserExerciseType(userID int, exerciseType string) {
+func (c *Connection) UpdateUserExerciseType(userID int, exerciseType string) error {
 	filter := bson.D{{"userid", userID}}
 
 	update := bson.D{
@@ -78,7 +85,6 @@ func (c *Connection) UpdateUserExerciseType(userID int, exerciseType string) {
 
 	collection := c.client.Database(databaseName).Collection(userExerciseTypeCollection)
 	_, err := collection.UpdateOne(context.TODO(), filter, update, options.Update().SetUpsert(true))
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	return err
 }
