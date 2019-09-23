@@ -3,10 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/joho/godotenv"
 	grammarexercise "github.com/tdidierjean/german_grammar/german_grammar_server/app"
 )
 
@@ -15,6 +17,13 @@ const exerciseTypePrepositionsParam = 2
 const exerciseTypeAdjectivesParam = 3
 
 var exerciseGenerator grammarexercise.ExerciseGenerator
+
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(os.ExpandEnv("$GOPATH/src/github.com/tdidierjean/german_grammar/german_grammar_server/.env")); err != nil {
+		log.Print("No .env file found")
+	}
+}
 
 func main() {
 	exerciseGenerator := grammarexercise.CreateExerciseGenerator()

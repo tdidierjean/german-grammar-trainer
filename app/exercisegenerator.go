@@ -21,9 +21,11 @@ var ExerciseTypes = []string{
 type randomPickable interface{}
 
 type Exercise struct {
-	Sentence string
-	Hint     string
-	Answer   string
+	Sentence     string
+	Hint         string
+	Answer       string
+	Keywords     []string
+	Translations map[string]string
 }
 
 type ExerciseTemplate struct {
@@ -78,21 +80,28 @@ func CreateExerciseGenerator() *ExerciseGenerator {
 // GetExercises Get a list of generated exercises according to the types and size requested
 // possible types are object, preposition and adjective
 // if multiple types are specified, the type of each exercise is randomly picked within those types
-func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*Exercise, error) {
+func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int, withTranslations bool) ([]*Exercise, error) {
+	var exercise *Exercise
 	var exercises []*Exercise
 	for i := 0; i < count; i++ {
 		switch exerciseTypes[e.Randomizer.getRandIndex(len(exerciseTypes))] {
 		case ExerciseTypeObject:
-			exercises = append(exercises, e.GetObjectExerciseDefault(ObjectExerciseTemplates))
+			exercise = e.GetObjectExerciseDefault(ObjectExerciseTemplates)
 			break
 		case ExerciseTypePreposition:
-			exercises = append(exercises, e.GetPrepositionExerciseDefault(PrepositionTemplates))
+			exercise = e.GetPrepositionExerciseDefault(PrepositionTemplates)
 			break
 		case ExerciseTypeAdjective:
-			exercises = append(exercises, e.GetAdjectiveExerciseDefault(AdjectiveTemplates))
+			exercise = e.GetAdjectiveExerciseDefault(AdjectiveTemplates)
 			break
 		default:
 			return nil, errors.New("Invalid exercise type requested")
+		}
+
+		exercises = append(exercises, exercise)
+
+		if withTranslations {
+			addKeywordsTranslations(exercise)
 		}
 	}
 
@@ -103,7 +112,7 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int) ([]*
 // possible types are object, preposition and adjective
 // if multiple types are specified, the type of the exercise is randomly picked within those types
 func (e *ExerciseGenerator) GetExercise(exerciseTypes []string) (*Exercise, error) {
-	exercises, err := e.GetExercises(exerciseTypes, 1)
+	exercises, err := e.GetExercises(exerciseTypes, 1, false)
 
 	if err != nil {
 		return nil, err
@@ -120,9 +129,9 @@ func (e *ExerciseGenerator) getObjectExercise(templates []ExerciseTemplate, arti
 	exercise.Sentence = exerciseTemplate.sentence
 
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
+	exercise.Keywords = append(exercise.Keywords, noun.String())
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
-
 	exercise.Answer = reflect.ValueOf(articles).FieldByName(exerciseTemplate.grammarCase).Index(int(noun.gender)).String()
 
 	return exercise
@@ -142,6 +151,7 @@ func (e *ExerciseGenerator) getPrepositionExercise(templates []ExerciseTemplate,
 	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, preposition.preposition)
 
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
+	exercise.Keywords = append(exercise.Keywords, noun.String())
 
 	exercise.Hint = articles.nominative[noun.gender] + " " + noun.word
 
@@ -163,6 +173,8 @@ func (e *ExerciseGenerator) getAdjectiveExercise(templates []ExerciseTemplate, a
 
 	exerciseTemplate := templates[e.Randomizer.getRandIndex(len(templates))]
 	noun := exerciseTemplate.nouns[e.Randomizer.getRandIndex(len(exerciseTemplate.nouns))]
+	exercise.Keywords = append(exercise.Keywords, noun.String())
+
 	caseArticles := reflect.ValueOf(articles).FieldByName(exerciseTemplate.grammarCase)
 	exercise.Sentence = fmt.Sprintf(exerciseTemplate.sentence, caseArticles.Index(int(noun.gender)), noun.word)
 
@@ -205,4 +217,12 @@ func (r *Randomizer) getRandIndex(length int) int {
 	}
 
 	return rand.Intn(length)
+}
+
+// Fetch translations for the exercise's keywords
+func addKeywordsTranslations(exercise *Exercise) {
+	exercise.Translations = make(map[string]string)
+	for i := 0; i < len(exercise.Keywords); i++ {
+		exercise.Translations[exercise.Keywords[i]] = TranslateText(exercise.Keywords[i], "de", "en")
+	}
 }

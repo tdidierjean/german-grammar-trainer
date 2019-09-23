@@ -14,6 +14,10 @@ type Noun struct {
 	gender int8
 }
 
+func (n *Noun) String() string {
+	return DefiniteArticlesCases.nominative[n.gender] + " " + n.word
+}
+
 type Adjective struct {
 	word string
 }

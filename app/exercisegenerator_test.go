@@ -66,5 +66,5 @@ func TestGetAdjectiveExercise(t *testing.T) {
 func BenchmarkGetGetExercises(b *testing.B) {
 	var randomizer = new(Randomizer)
 	exerciseGenerator := ExerciseGenerator{Randomizer: randomizer}
-	exerciseGenerator.GetExercises([]string{"object"}, 10000)
+	exerciseGenerator.GetExercises([]string{"object"}, 10000, false)
 }
