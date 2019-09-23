@@ -26,7 +26,7 @@ func (r *queryResolver) Exercises(ctx context.Context, count *int, exerciseType 
 		return nil, errors.New("No exercise type specified")
 	}
 
-	rawExercises, err := exerciseGenerator.GetExercises([]string{*exerciseType}, *count)
+	rawExercises, err := exerciseGenerator.GetExercises([]string{*exerciseType}, *count, true)
 
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (r *queryResolver) Exercises(ctx context.Context, count *int, exerciseType 
 
 	var exercises []*Exercise
 	for _, exercise := range rawExercises {
-		exercises = append(exercises, r.transformExeciseToGraphQL(exercise))
+		exercises = append(exercises, r.transformExerciseToGraphQL(exercise))
 	}
 
 	return exercises, nil
@@ -45,11 +45,20 @@ func (r *queryResolver) ExerciseTypes(ctx context.Context) ([]string, error) {
 	return grammarexercise.ExerciseTypes, nil
 }
 
-func (r *Resolver) transformExeciseToGraphQL(exercise *grammarexercise.Exercise) *Exercise {
+// Transform the business exercise entity into the graphql entity
+func (r *Resolver) transformExerciseToGraphQL(exercise *grammarexercise.Exercise) *Exercise {
+	var translation Translation
+	var translations []*Translation
+	for k, v := range exercise.Translations {
+		translation = Translation{k, v}
+		translations = append(translations, &translation)
+	}
+
 	return &Exercise{
-		Question: exercise.Sentence,
-		Hint:     exercise.Hint,
-		Answer:   exercise.Answer,
+		Question:     exercise.Sentence,
+		Hint:         exercise.Hint,
+		Answer:       exercise.Answer,
+		Translations: translations,
 	}
 }
 

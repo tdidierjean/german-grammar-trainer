@@ -3,11 +3,17 @@
 package graphql
 
 type Exercise struct {
-	Question string `json:"question"`
-	Hint     string `json:"hint"`
-	Answer   string `json:"answer"`
+	Question     string         `json:"question"`
+	Hint         string         `json:"hint"`
+	Answer       string         `json:"answer"`
+	Translations []*Translation `json:"translations"`
 }
 
 type NewExerciseType struct {
 	ExerciseType string `json:"exerciseType"`
+}
+
+type Translation struct {
+	Original    string `json:"original"`
+	Translation string `json:"translation"`
 }

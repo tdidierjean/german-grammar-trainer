@@ -6,6 +6,12 @@ type Exercise {
   question: String!
   hint: String!
   answer: String!
+  translations: [Translation]
+}
+
+type Translation {
+  original: String!
+  translation: String!
 }
 
 type Query {
