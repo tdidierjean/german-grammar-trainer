@@ -15,7 +15,7 @@ type Translation {
 }
 
 type Query {
-  exercises(count: Int = 10, exerciseType: String): [Exercise!]!
+  exercises(count: Int = 10, exerciseType: String, withTranslations: Boolean = false): [Exercise!]!
   exerciseTypes: [String!]!
 }
 

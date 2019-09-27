@@ -55,7 +55,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		ExerciseTypes func(childComplexity int) int
-		Exercises     func(childComplexity int, count *int, exerciseType *string) int
+		Exercises     func(childComplexity int, count *int, exerciseType *string, withTranslations *bool) int
 	}
 
 	Translation struct {
@@ -68,7 +68,7 @@ type MutationResolver interface {
 	UpdateExerciseType(ctx context.Context, input NewExerciseType) (*string, error)
 }
 type QueryResolver interface {
-	Exercises(ctx context.Context, count *int, exerciseType *string) ([]*Exercise, error)
+	Exercises(ctx context.Context, count *int, exerciseType *string, withTranslations *bool) ([]*Exercise, error)
 	ExerciseTypes(ctx context.Context) ([]string, error)
 }
 
@@ -144,7 +144,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Exercises(childComplexity, args["count"].(*int), args["exerciseType"].(*string)), true
+		return e.complexity.Query.Exercises(childComplexity, args["count"].(*int), args["exerciseType"].(*string), args["withTranslations"].(*bool)), true
 
 	case "Translation.original":
 		if e.complexity.Translation.Original == nil {
@@ -239,7 +239,7 @@ type Translation {
 }
 
 type Query {
-  exercises(count: Int = 10, exerciseType: String): [Exercise!]!
+  exercises(count: Int = 10, exerciseType: String, withTranslations: Boolean = false): [Exercise!]!
   exerciseTypes: [String!]!
 }
 
@@ -303,6 +303,14 @@ func (ec *executionContext) field_Query_exercises_args(ctx context.Context, rawA
 		}
 	}
 	args["exerciseType"] = arg1
+	var arg2 *bool
+	if tmp, ok := rawArgs["withTranslations"]; ok {
+		arg2, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["withTranslations"] = arg2
 	return args, nil
 }
 
@@ -554,7 +562,7 @@ func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Exercises(rctx, args["count"].(*int), args["exerciseType"].(*string))
+		return ec.resolvers.Query().Exercises(rctx, args["count"].(*int), args["exerciseType"].(*string), args["withTranslations"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
