@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"reflect"
+	"sync"
 	"time"
 )
 
@@ -83,6 +84,8 @@ func CreateExerciseGenerator() *ExerciseGenerator {
 func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int, withTranslations bool) ([]*Exercise, error) {
 	var exercise *Exercise
 	var exercises []*Exercise
+	var wg sync.WaitGroup
+
 	for i := 0; i < count; i++ {
 		switch exerciseTypes[e.Randomizer.getRandIndex(len(exerciseTypes))] {
 		case ExerciseTypeObject:
@@ -100,10 +103,15 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int, with
 
 		exercises = append(exercises, exercise)
 
+		// we're using a wait group to account for all the pending asynchronous translation requests
 		if withTranslations {
-			addKeywordsTranslations(exercise)
+			wg.Add(1)
+			go addKeywordsTranslations(exercise, &wg)
 		}
 	}
+
+	// wait until all the translation requests have returned
+	wg.Wait()
 
 	return exercises, nil
 }
@@ -220,9 +228,11 @@ func (r *Randomizer) getRandIndex(length int) int {
 }
 
 // Fetch translations for the exercise's keywords
-func addKeywordsTranslations(exercise *Exercise) {
+func addKeywordsTranslations(exercise *Exercise, wg *sync.WaitGroup) {
 	exercise.Translations = make(map[string]string)
-	for i := 0; i < len(exercise.Keywords); i++ {
-		exercise.Translations[exercise.Keywords[i]] = TranslateText(exercise.Keywords[i], "de", "en")
+
+	for i, keyword := range exercise.Keywords {
+		exercise.Translations[keyword] = TranslateText(keyword, "de", "en")
+		wg.Done()
 	}
 }

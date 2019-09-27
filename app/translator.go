@@ -42,7 +42,7 @@ func TranslateText(text string, fromLanguage string, toLanguage string) string {
 		log.Fatalf("Failed to parse target language: %v", err)
 	}
 
-	// Translates the text into Russian.
+	// Translates the text into target language.
 	translations, err := client.Translate(ctx, []string{text}, target, &translate.Options{Source: source})
 	if err != nil {
 		log.Fatalf("Failed to translate text: %v", err)
