@@ -231,7 +231,7 @@ func (r *Randomizer) getRandIndex(length int) int {
 func addKeywordsTranslations(exercise *Exercise, wg *sync.WaitGroup) {
 	exercise.Translations = make(map[string]string)
 
-	for i, keyword := range exercise.Keywords {
+	for _, keyword := range exercise.Keywords {
 		exercise.Translations[keyword] = TranslateText(keyword, "de", "en")
 		wg.Done()
 	}
