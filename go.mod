@@ -5,7 +5,8 @@ go 1.12
 require (
 	cloud.google.com/go v0.46.3
 	github.com/99designs/gqlgen v0.9.2
-	github.com/gorilla/handlers v1.4.2
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/vektah/gqlparser v1.1.2
