@@ -19,8 +19,6 @@ var ExerciseTypes = []string{
 	ExerciseTypeAdjective,
 }
 
-type randomPickable interface{}
-
 type Exercise struct {
 	Sentence     string
 	Hint         string
@@ -90,15 +88,12 @@ func (e *ExerciseGenerator) GetExercises(exerciseTypes []string, count int, with
 		switch exerciseTypes[e.Randomizer.getRandIndex(len(exerciseTypes))] {
 		case ExerciseTypeObject:
 			exercise = e.GetObjectExerciseDefault(ObjectExerciseTemplates)
-			break
 		case ExerciseTypePreposition:
 			exercise = e.GetPrepositionExerciseDefault(PrepositionTemplates)
-			break
 		case ExerciseTypeAdjective:
 			exercise = e.GetAdjectiveExerciseDefault(AdjectiveTemplates)
-			break
 		default:
-			return nil, errors.New("Invalid exercise type requested")
+			return nil, errors.New("invalid exercise type requested")
 		}
 
 		exercises = append(exercises, exercise)

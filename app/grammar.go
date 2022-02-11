@@ -93,7 +93,7 @@ var Prepositions = []Preposition{
 	{"nach", Dative},      //after
 	{"seit", Dative},      //since
 	{"von", Dative},       //from
-	{"gegenüber", Dative}, //from
+	{"gegenüber", Dative}, //opposite
 }
 
 var DefiniteArticlesAdjectiveCaseEndings = Cases{
